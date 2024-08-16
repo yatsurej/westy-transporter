@@ -7,7 +7,6 @@
     
     unset($_SESSION['registration_success']);
 
-    $pageTitle = "Westy Transporter";
     require 'components/header.php';
 ?>
 

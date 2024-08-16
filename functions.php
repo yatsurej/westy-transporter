@@ -40,6 +40,7 @@
         }
 
         $result = $classUser->register($firstName, $lastName, $email, $mobileNumber, $password, $governmentIDPath, $companyIDPath);
+        
         if($result) {
             $_SESSION['registration_success'] = true;
             header("Location: thanks");
@@ -60,6 +61,24 @@
             } else{
                 echo "<script>alert('Invalid login details. Please try again.');window.location.href='./login';</script>";
             }
+        }
+    } elseif(isset($_POST['addClient'])){
+        $clientName                 = $_POST['clientName'];
+        $clientAddress              = $_POST['clientAddress'];
+        $clientTypeEstablishment    = $_POST['clientTypeEstablishment'];
+        $clientContactPerson        = $_POST['clientContactPerson'];
+        $clientContactNumber        = $_POST['clientContactNumber'];
+        $clientEmail                = $_POST['clientEmail'];
+        $clientCRS                  = $_POST['clientCRS'];
+        $clientHW                   = $_POST['clientHW'];
+
+        $result = $classUser->addClient($clientName, $clientAddress, $clientTypeEstablishment, $clientContactPerson, $clientContactNumber, $clientEmail, $clientCRS, $clientHW);
+
+        if ($result){
+            header("Location: client");
+            exit();
+        } else{
+            echo "<script>alert('An error occurred. Please try again.');window.location.href='./client';</script>";
         }
     }
 ?>

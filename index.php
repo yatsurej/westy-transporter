@@ -6,11 +6,9 @@
         exit();
     }
 
-    $pageTitle = "Westy Transporter";
     require 'components/header.php';
     require 'components/db.php';
     
-    // Get logged in user details
     $email = $_SESSION['user'];
     $query = "SELECT * FROM user WHERE userEmail = ?";
     $stmt = $conn->prepare($query);
@@ -25,11 +23,8 @@
         $userLname = $row['userLname'];
         $userType = $row['userType'];
     }
+    $_SESSION['userID'] = $userID;
     $_SESSION['userType'] = $userType;
 
     include 'components/navbar.php';
-    include 'components/sidebar.php';
 ?>
-
-<div class="main-content">
-</div>

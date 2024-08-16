@@ -6,7 +6,6 @@
         exit();
     }
 
-    $pageTitle = "Westy Transporter";
     require 'components/header.php';
     include 'components/navbar.php';
 ?>

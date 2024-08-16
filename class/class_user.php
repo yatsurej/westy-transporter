@@ -56,6 +56,28 @@
                 }
                 $stmt->close();
             }
+
+            // add client
+            public function addClient($clientName, $clientAddress, $clientTypeEstablishment, $clientContactPerson, $clientContactNumber, $clientEmail, $clientCRS, $clientHW){
+                global $conn;
+
+                $query = "INSERT INTO client(clientName, clientAddress, clientType, clientContactPerson, clientContactNumber, clientEmail, clientCRS, clientHW, dateSubmitted, dateExpiry)
+                          VALUES(?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)";
+                $stmt = $conn->prepare($query);
+
+                if ($stmt === false) {
+                    die('Prepare failed: ' . htmlspecialchars($conn->error));
+                }
+
+                $stmt->bind_param('ssssssss', $clientName, $clientAddress, $clientTypeEstablishment, $clientContactPerson, $clientContactNumber, $clientEmail, $clientCRS, $clientHW);
+
+                if ($stmt->execute()){
+                    return true;
+                } else{
+                    return false;
+                }
+                $stmt->close();
+            }
         }
     }
 ?>
