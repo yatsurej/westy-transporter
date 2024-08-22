@@ -1,4 +1,6 @@
 <?php
+require '../class/class_user.php';
+$classUser = new User;
 session_start();
 
 // Function to handle file upload and permit addition
@@ -147,6 +149,107 @@ function handleDeleteWasteProfile() {
     exit();
 }
 
+// Function to handle file upload
+function handleAddFile() {
+    // Directories for file uploads
+    $targetDir = "uploads/";
+    
+    // Get file data
+    $fileType = isset($_POST['fileType']) ? htmlspecialchars($_POST['fileType']) : '';
+    $fileName = basename($_FILES['fileName']['name']);
+    $fileTmpName = $_FILES['fileName']['tmp_name'];
+    $fileSize = $_FILES['fileName']['size'];
+    
+    // Validate file input
+    if (empty($fileType) || empty($fileName)) {
+        echo "File type and file name are required.";
+        return;
+    }
+
+    // Set target file path
+    $targetFile = $targetDir . $fileName;
+    
+    // Move uploaded file to the target directory
+    if (move_uploaded_file($fileTmpName, $targetFile)) {
+        // Add file info to the session
+        $_SESSION['files'] = $_SESSION['files'] ?? [];
+        $_SESSION['files'][] = [
+            'fileName' => $fileName,
+            'fileSize' => round($fileSize / 1024, 2) . " KB",
+            'fileType' => $fileType
+        ];
+
+        header("Location: application?step=5");
+        exit();
+    } else {
+        echo "Sorry, there was an error uploading your file.";
+    }
+}
+
+// Function to handle file deletion
+function handleDeleteFile() {
+    $delete_key = $_POST['delete_key'];
+
+    if (isset($_SESSION['files'][$delete_key])) {
+        // Remove file from server
+        $filename = $_SESSION['files'][$delete_key]['fileName'];
+        $filePath = "uploads/" . $filename;
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        // Remove file from session
+        unset($_SESSION['files'][$delete_key]);
+        $_SESSION['files'] = array_values($_SESSION['files']);
+    }
+
+    header("Location: application?step=5");
+    exit();
+}
+
+function submitApplication($classUser){
+    // General Information
+    $clientID = isset($_POST['clientID']) ? htmlspecialchars($_POST['clientID']) : '';
+    $managingHead = isset($_POST['managingHead']) ? htmlspecialchars($_POST['managingHead']) : '';
+    $managingHeadMobNum = isset($_POST['managingHeadMobNum']) ? htmlspecialchars($_POST['managingHeadMobNum']) : '';
+    $managingHeadTelNum = isset($_POST['managingHeadTelNum']) ? htmlspecialchars($_POST['managingHeadTelNum']) : '';
+    $natureBusiness = isset($_POST['natureBusiness']) ? htmlspecialchars($_POST['natureBusiness']) : '';
+    $psicNum = isset($_POST['psicNum']) ? htmlspecialchars($_POST['psicNum']) : '';
+    $psicDesc = isset($_POST['psicDesc']) ? htmlspecialchars($_POST['psicDesc']) : '';
+    $dateEstablishment = isset($_POST['dateEstablishment']) ? htmlspecialchars($_POST['dateEstablishment']) : '';
+    $numEmployees = isset($_POST['numEmployees']) ? htmlspecialchars($_POST['numEmployees']) : '';
+    
+    // Pollution Control Officer Information
+    $pcoName = isset($_POST['pcoName']) ? htmlspecialchars($_POST['pcoName']) : '';
+    $pcoMobNum = isset($_POST['pcoMobNum']) ? htmlspecialchars($_POST['pcoMobNum']) : '';
+    $pcoTelNum = isset($_POST['pcoTelNum']) ? htmlspecialchars($_POST['pcoTelNum']) : '';
+    $pcoEmail = isset($_POST['pcoEmail']) ? htmlspecialchars($_POST['pcoEmail']) : '';
+    $pcoAccredNo = isset($_POST['pcoAccredNo']) ? htmlspecialchars($_POST['pcoAccredNo']) : '';
+    $pcoAccredDate = isset($_POST['pcoAccredDate']) ? htmlspecialchars($_POST['pcoAccredDate']) : '';
+    
+    // Facility Address
+    $region = isset($_POST['region']) ? htmlspecialchars($_POST['region']) : '';
+    $province = isset($_POST['province']) ? htmlspecialchars($_POST['province']) : '';
+    $city = isset($_POST['city']) ? htmlspecialchars($_POST['city']) : '';
+    $barangay = isset($_POST['barangay']) ? htmlspecialchars($_POST['barangay']) : '';
+    $zipCode = isset($_POST['zipCode']) ? htmlspecialchars($_POST['zipCode']) : '';
+    
+    // Geolocation
+    $latitude = isset($_POST['latitude']) ? htmlspecialchars($_POST['latitude']) : '';
+    $longitude = isset($_POST['longitude']) ? htmlspecialchars($_POST['longitude']) : '';
+
+    $result = $classUser->submitApplication($clientID, $managingHead, $managingHeadMobNum, $managingHeadTelNum, $natureBusiness, $psicNum, $psicDesc, $dateEstablishment, $numEmployees, 
+                                            $pcoName, $pcoMobNum, $pcoTelNum, $pcoEmail, $pcoAccredNo, $pcoAccredDate,
+                                            $region, $province, $city, $barangay, $zipCode,
+                                            $latitude, $longitude);
+
+    if ($result){
+        header("Location: application");
+        exit();
+    }
+}
+
 // Main switch statement
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch (true) {
@@ -173,6 +276,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
         case isset($_POST['delete_wasteProfile']):
             handleDeleteWasteProfile();
+            break;
+        case isset($_POST['addFile']):
+            handleAddFile();
+            break;
+        case isset($_POST['delete_file']):
+            handleDeleteFile();
+            break;
+        case isset($_POST['finalizeApplication']):
+            submitApplication($classUser);
             break;
         default:
             echo "Invalid action.";

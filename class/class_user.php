@@ -1,5 +1,5 @@
 <?php
-    require './components/db.php';
+    require '../components/db.php';
 
     if (!class_exists('User')) {
         class User {
@@ -70,6 +70,32 @@
                 }
 
                 $stmt->bind_param('ssssssss', $clientName, $clientAddress, $clientTypeEstablishment, $clientContactPerson, $clientContactNumber, $clientEmail, $clientCRS, $clientHW);
+
+                if ($stmt->execute()){
+                    return true;
+                } else{
+                    return false;
+                }
+                $stmt->close();
+            }
+
+            // submit application
+            public function submitApplication($clientID, $managingHead, $managingHeadMobNum, $managingHeadTelNum, $natureBusiness, $psicNum, $psicDesc, $dateEstablishment, $numEmployees, $pcoName, $pcoMobNum, $pcoTelNum, $pcoEmail, $pcoAccredNo, $pcoAccredDate, $region, $province, $city, $barangay, $zipCode, $latitude, $longitude){
+                global $conn;
+
+                $query = "INSERT INTO application(clientID, appRegistration, appManager, appManagerContactNumber, appManagerTelephoneNumber, 
+                                                appNatureBusiness, appPSICNum, appPSICDesc, appDateClient, appNumEmployees,
+                                                appPCOName, appPCOMobileNumber, appPCOTelephoneNumber, appPCOEmail, appPCOAccredNo, 
+                                                appPCODateAccred, appFaciRegion, appFaciProvince, appFaciCity, appFaciBarangay, 
+                                                appFaciZip, appGeoLatitude, appGeoLongitude, appStatus)
+                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PROCESSING')";
+
+                $stmt = $conn->prepare($query);
+
+                $stmt->bind_param('ssssssssssssssssssssss', $clientID, $managingHead, $managingHeadMobNum, $managingHeadTelNum, 
+                                $natureBusiness, $psicNum, $psicDesc, $dateEstablishment, $numEmployees, $pcoName, $pcoMobNum, 
+                                $pcoTelNum, $pcoEmail, $pcoAccredNo, $pcoAccredDate, $region, $province, $city, $barangay, 
+                                $zipCode, $latitude, $longitude);
 
                 if ($stmt->execute()){
                     return true;

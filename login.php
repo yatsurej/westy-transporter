@@ -17,7 +17,7 @@
             <h1 class="text-center fw-bold my-3" style="color:#253E23">Westy Transporter</h1>
             <div class="card w-100">
                 <div class="card-body mx-3 my-3">
-                    <form action="functions.php" method="post" autocomplete="off">
+                    <form action="functions.php" method="post">
                         <div class="row my-2">
                             <div class="col-xl-3 col-lg-3 col-md-3 my-2">
                                 <label class="fw-bold" for="email">Email</label>
